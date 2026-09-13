@@ -1,0 +1,33 @@
+{
+  "package": "KNEE-AI 3.3 Model Deployment",
+  "status": "FROZEN_FOR_DEPLOYMENT",
+  "model_version": "KNEE-AI 3.3",
+  "architecture": "StandaloneFiveSliceEfficientNet",
+  "backbone": "EfficientNet-B0",
+  "checkpoint": "best_5slice_model.pth",
+  "checkpoint_sha256": "ac59d8ce17a0b35c15189d691f7c6aa828f31a3dfe14601a02036a6c3b892a82",
+  "inference_module": "knee_ai_inference.py",
+  "input_size": [
+    224,
+    224
+  ],
+  "slice_context": 5,
+  "num_outputs": 12,
+  "outputs": [
+    "ACL",
+    "MCL",
+    "Medial Meniscus",
+    "Lateral Meniscus",
+    "Medial OA",
+    "Lateral OA",
+    "PF OA",
+    "Effusion",
+    "Synovitis",
+    "Baker's",
+    "Contusion",
+    "Fracture"
+  ],
+  "clinical_threshold_validated": false,
+  "radiologist_review_required": true,
+  "autonomous_diagnosis": false
+}

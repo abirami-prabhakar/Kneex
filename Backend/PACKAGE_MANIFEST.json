@@ -1,0 +1,36 @@
+{
+  "package": "KNEE_AI_COMPLETE_BACKEND_PACKAGE",
+  "status": "FINAL_BACKEND_AI_HANDOFF",
+  "model": {
+    "name": "KNEE-AI",
+    "version": "3.3",
+    "architecture": "StandaloneFiveSliceEfficientNet",
+    "backbone": "EfficientNet-B0",
+    "input_size": [
+      224,
+      224
+    ],
+    "slice_context": 5,
+    "num_outputs": 12,
+    "checkpoint_sha256": "ac59d8ce17a0b35c15189d691f7c6aa828f31a3dfe14601a02036a6c3b892a82"
+  },
+  "gradcam": {
+    "included": true,
+    "target_layer": "backbone.features.8.0",
+    "classes_supported": 12,
+    "heatmap_size": [
+      224,
+      224
+    ]
+  },
+  "backend_contracts": true,
+  "golden_case": true,
+  "validation_evidence": true,
+  "patient_schema": true,
+  "safety": {
+    "automatic_diagnosis": false,
+    "validated_clinical_threshold": false,
+    "radiologist_review_required": true,
+    "final_report_approval_required": true
+  }
+}
