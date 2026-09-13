@@ -1,0 +1,74 @@
+{
+    "project": "KNEE-AI",
+    "experiment": "3.3 \u2014 5-Slice Context",
+    "status": "FINAL CHAMPION",
+    "architecture": {
+        "input_slices": 5,
+        "slice_context": [
+            "i-2",
+            "i-1",
+            "i",
+            "i+1",
+            "i+2"
+        ],
+        "projection": "Conv2D 5\u21923, kernel 1\u00d71, bias=True",
+        "projection_activation": "sigmoid",
+        "backbone": "EfficientNet-B0",
+        "outputs": 12,
+        "output_activation": "sigmoid"
+    },
+    "preprocessing": {
+        "image_size": "224x224",
+        "normalization": "robust 1st\u201399th percentile",
+        "imagenet_normalization": true,
+        "photometric_monochrome1_handling": true
+    },
+    "labels": [
+        "ACL",
+        "MCL",
+        "Medial Meniscus",
+        "Lateral Meniscus",
+        "Medial OA",
+        "Lateral OA",
+        "PF OA",
+        "Effusion",
+        "Synovitis",
+        "Baker's",
+        "Contusion",
+        "Fracture"
+    ],
+    "data_split": {
+        "train_studies": 40,
+        "validation_studies": 9,
+        "validation_stacks": 844,
+        "test_used_for_this_audit": false
+    },
+    "performance": {
+        "validation_macro_auroc": 0.7136243386,
+        "recorded_auroc": 0.7136243386,
+        "reproduced_auroc": 0.7136243386,
+        "reproduction_difference": 0.0
+    },
+    "comparison": {
+        "baseline_audit": 0.626257,
+        "augmentation_3_2_A": 0.687235,
+        "champion_3_3": 0.7136243386,
+        "improvement_vs_baseline": 0.0873673386,
+        "improvement_vs_3_2_A": 0.0263893386
+    },
+    "explainability": {
+        "method": "Grad-CAM",
+        "target_layer": "model.backbone.features[-1]",
+        "validation_cases": 6,
+        "clinical_interpretation": "Visual explanation of image regions influencing model predictions; not segmentation or clinical validation."
+    },
+    "reproducibility": {
+        "checkpoint_load": "PASS",
+        "missing_keys": 0,
+        "unexpected_keys": 0,
+        "forward_pass": "PASS",
+        "exact_validation_reproduction": "PASS",
+        "difference": 0.0
+    },
+    "created": "2026-09-11T14:22:08.423572"
+}

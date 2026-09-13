@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
-import { createServer as createViteServer } from "vite";
 
 const app = express();
 const PORT = 3000;
@@ -286,9 +285,15 @@ app.post("/api/v1/ai/analyze", (req, res) => {
 // POST /api/v1/radiologist/review
 app.post("/api/v1/radiologist/review", (req, res) => {
   const { study_id, findings } = req.body || {};
+  const targetId = study_id || GOLDEN_CASE_ID;
+  const study = studiesStore.find((s) => s.id === targetId);
+  if (study) {
+    study.review_status = "COMPLETED";
+    (study as any).findings = findings;
+  }
   res.json({
     success: true,
-    study_id: study_id || GOLDEN_CASE_ID,
+    study_id: targetId,
     message: "Radiologist review decisions recorded",
     findings_count: Array.isArray(findings) ? findings.length : 0,
   });
@@ -309,12 +314,21 @@ app.post("/api/v1/gradcam/explain", (req, res) => {
 
 // POST /api/v1/report/generate
 app.post("/api/v1/report/generate", async (req, res) => {
-  const { study_id, findings, clinical_context } = req.body || {};
-  const approvedFindings = Array.isArray(findings)
-    ? findings.filter((f: any) => f.status === "APPROVED" || f.status === "approved")
+  const { study_id, findings: inputFindings, clinical_context } = req.body || {};
+  const targetId = study_id || GOLDEN_CASE_ID;
+  const study = studiesStore.find((s) => s.id === targetId);
+  
+  const rawFindings = Array.isArray(inputFindings) && inputFindings.length > 0
+    ? inputFindings
+    : ((study as any)?.findings || []);
+
+  const approvedFindings = Array.isArray(rawFindings)
+    ? rawFindings.filter((f: any) => f.status === "APPROVED" || f.status === "approved")
     : [];
 
   const client = getGeminiClient();
+  let generatedReportData: any = null;
+
   if (client) {
     try {
       const prompt = `You are a clinical report drafting assistant for the KNEE-AI 3.3 system.
@@ -323,12 +337,12 @@ The information supplied to you has already been reviewed and approved by a radi
 You are NOT the diagnostic engine.
 
 STUDY ID:
-${study_id || GOLDEN_CASE_ID}
+${targetId}
 
 RADIOLOGIST-APPROVED FINDINGS:
 ${JSON.stringify(approvedFindings)}
 
-AUTHORIZED CLINICAL CONTEXT:
+AUTHORISED CLINICAL CONTEXT:
 ${typeof clinical_context === "object" ? JSON.stringify(clinical_context) : clinical_context || "None provided"}
 
 STRICT RULES:
@@ -351,7 +365,7 @@ STRICT RULES:
 OUTPUT: Return ONLY valid JSON with this schema:
 {
   "title": "Knee MRI Report",
-  "study_id": "${study_id || GOLDEN_CASE_ID}",
+  "study_id": "${targetId}",
   "status": "DRAFT",
   "findings": ["..."],
   "impression": "...",
@@ -367,37 +381,40 @@ OUTPUT: Return ONLY valid JSON with this schema:
       });
 
       const text = response.text || "";
-      const parsed = JSON.parse(text);
-      return res.json({
-        status: "DRAFT",
-        report: parsed,
-        final_approval: "PENDING",
-      });
+      generatedReportData = JSON.parse(text);
     } catch (err) {
       console.warn("Gemini generation failed, falling back to deterministic draft:", err);
     }
   }
 
-  // Schema-compliant draft fallback
-  const findingsList = approvedFindings.length > 0
-    ? approvedFindings.map((f: any) => `${f.abnormality} abnormality identified and approved during radiologist review.`)
-    : ["No abnormal findings approved for inclusion in this study."];
+  if (!generatedReportData) {
+    const findingsList = approvedFindings.length > 0
+      ? approvedFindings.map((f: any) => `${f.abnormality} abnormality identified and approved during radiologist review.`)
+      : ["No abnormal findings approved for inclusion in this study."];
 
-  const impression = approvedFindings.length > 0
-    ? `The approved findings demonstrate abnormalities (${approvedFindings.map((f: any) => f.abnormality).join(", ")}) requiring clinical correlation.`
-    : "No significant abnormalities confirmed upon radiologist review.";
+    const impression = approvedFindings.length > 0
+      ? `The approved findings demonstrate abnormalities (${approvedFindings.map((f: any) => f.abnormality).join(", ")}) requiring clinical correlation.`
+      : "No significant abnormalities confirmed upon radiologist review.";
 
-  res.json({
-    status: "DRAFT",
-    report: {
+    generatedReportData = {
       title: "Knee MRI Report",
-      study_id: study_id || GOLDEN_CASE_ID,
+      study_id: targetId,
       status: "DRAFT",
       findings: findingsList,
       impression: impression,
       note: "This is an AI-generated draft based on radiologist-approved information and requires radiologist review and final approval.",
       final_approval: "PENDING",
-    },
+    };
+  }
+
+  if (study) {
+    study.report_status = "DRAFT";
+    (study as any).report = generatedReportData;
+  }
+
+  res.json({
+    status: "DRAFT",
+    report: generatedReportData,
     final_approval: "PENDING",
   });
 });
@@ -405,9 +422,20 @@ OUTPUT: Return ONLY valid JSON with this schema:
 // POST /api/v1/report/final-approval
 app.post("/api/v1/report/final-approval", (req, res) => {
   const { study_id } = req.body || {};
+  const targetId = study_id || GOLDEN_CASE_ID;
+  const study = studiesStore.find((s) => s.id === targetId);
+
+  if (study) {
+    study.report_status = "FINAL";
+    if ((study as any).report) {
+      (study as any).report.status = "FINAL";
+      (study as any).report.final_approval = "APPROVED";
+    }
+  }
+
   res.json({
     success: true,
-    study_id: study_id || GOLDEN_CASE_ID,
+    study_id: targetId,
     status: "FINAL",
     approval_timestamp: new Date().toISOString(),
     message: "Report approved and finalized by attending radiologist",
@@ -488,22 +516,34 @@ OUTPUT: Return ONLY valid JSON:
 // -------------------------------------------------------------
 
 async function start() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+  try {
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        const { createServer: createViteServer } = await import("vite");
+        const vite = await createViteServer({
+          server: { middlewareMode: true },
+          appType: "spa",
+        });
+        app.use(vite.middlewares);
+      } catch (viteErr) {
+        console.warn("Vite dev middleware failed (native binary policy), falling back to static server:", viteErr);
+        app.use(express.static(path.join(process.cwd(), "public")));
+      }
+    } else {
+      const distPath = path.join(process.cwd(), "dist");
+      app.use(express.static(distPath));
+      app.get("*", (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    }
+  } catch (err) {
+    console.error("Error starting server:", err);
   }
 
+  app.use(express.static(path.join(process.cwd(), "public")));
+
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+    console.log(`KNEEX Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

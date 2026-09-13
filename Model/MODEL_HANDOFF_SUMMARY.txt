@@ -1,0 +1,93 @@
+
+KNEE-AI 3.3 — FINAL MODEL HANDOFF
+=================================
+
+STATUS
+------
+FINAL CHAMPION
+
+MODEL
+-----
+5-slice context:
+[i-2, i-1, i, i+1, i+2]
+
+Learned projection:
+Conv2D 5 -> 3
+Kernel: 1x1
+Bias: True
+Activation: Sigmoid
+
+Backbone:
+EfficientNet-B0
+
+Outputs:
+12 independent abnormality predictions
+
+INPUT
+-----
+224 x 224
+Robust 1st-99th percentile normalization
+ImageNet normalization
+
+12 ABNORMALITIES
+----------------
+ACL
+MCL
+Medial Meniscus
+Lateral Meniscus
+Medial OA
+Lateral OA
+PF OA
+Effusion
+Synovitis
+Baker's
+Contusion
+Fracture
+
+VALIDATION
+----------
+Train studies: 40
+Validation studies: 9
+Validation stacks: 844
+
+RESULT
+------
+Validation macro-AUROC: 0.713624
+
+EXACT REPRODUCTION
+------------------
+Recorded:    0.713624
+Reproduced:  0.713624
+Difference:  0.000000
+
+STATUS: EXACT REPRODUCTION PASSED
+
+COMPARISON
+----------
+Baseline:       0.626257
+3.2-A:          0.687235
+3.3 Champion:   0.713624
+
+Improvement vs baseline: +0.087367
+Improvement vs 3.2-A:   +0.026389
+
+GRAD-CAM
+--------
+Method: Grad-CAM
+Target: EfficientNet-B0 final feature block
+Cases generated: 6
+
+Selected strong visual examples:
+1. MCL — P=0.894
+2. Lateral OA — P=0.980
+3. Baker's — P=0.652
+
+IMPORTANT
+---------
+Grad-CAM is used as a visual explanation of regions
+influencing model predictions. It is not a segmentation
+mask and does not constitute clinical validation.
+
+TEST SET
+--------
+The locked test set was NOT used during this reproduction audit.

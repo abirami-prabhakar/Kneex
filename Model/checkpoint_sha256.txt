@@ -1,0 +1,2 @@
+best_5slice_model.pth
+ac59d8ce17a0b35c15189d691f7c6aa828f31a3dfe14601a02036a6c3b892a82
