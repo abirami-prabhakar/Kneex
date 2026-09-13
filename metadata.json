@@ -1,0 +1,8 @@
+{
+  "name": "Kneex",
+  "description": "AI-assisted knee MRI analysis clinical dashboard with 12 abnormality findings, Grad-CAM explainability, and radiologist-reviewed reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

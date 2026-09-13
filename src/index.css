@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   KNEEX — Archival Clinical Modernist Design System (Stitch Verbatim Spec)
+   Rigorous, cerebral, tactile, editorial clinical workstation aesthetic
+   ========================================================================= */
+
+@layer base {
+  body {
+    background-color: #EEF0FF;
+    background-image: 
+      linear-gradient(to right, rgba(38, 59, 115, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(38, 59, 115, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #181b26;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, .font-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Archival Plate & Contour Canvas Tokens */
+.plate-card {
+  background-color: #FFF9EE;
+  border: 1.5px solid #34497F;
+  box-shadow: 3px 3px 0px 0px #263B73;
+}
+
+.plate-card-focal {
+  background-color: #FFF9EE;
+  border: 1.5px solid #34497F;
+  box-shadow: 5px 5px 0px 0px #263B73;
+}
+
+.dashed-ink-border {
+  border-style: dashed;
+  border-color: #34497F;
+  border-width: 1.5px;
+}
+
+.dashed-ink-divider {
+  border-bottom: 1.5px dashed #34497F;
+}
+
+.peach-pill-banner {
+  background-color: #FFE0C5;
+  color: #263B73;
+  border: 1.5px solid #34497F;
+}
+
+.btn-primary-archival {
+  background-color: #263B73;
+  color: #FFF9EE;
+  border: 1.5px solid #263B73;
+  box-shadow: 2px 2px 0px 0px #34497F;
+  transition: all 120ms ease;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.btn-primary-archival:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px #34497F;
+}
+.btn-primary-archival:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px transparent;
+}
+.btn-primary-archival:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 2px 2px 0px 0px #34497F;
+}
+
+.btn-secondary-archival {
+  background-color: #FFF9EE;
+  color: #263B73;
+  border: 1.5px solid #34497F;
+  box-shadow: 2px 2px 0px 0px #34497F;
+  transition: all 120ms ease;
+  font-weight: 600;
+}
+.btn-secondary-archival:hover {
+  background-color: #FFE0C5;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px 0px #34497F;
+}
+.btn-secondary-archival:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px transparent;
+}
+.btn-secondary-archival:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status Chips according to Stitch specification */
+.status-badge-pending {
+  background-color: #FEF3C7;
+  color: #D97706;
+  border: 1px solid #D97706;
+}
+
+.status-badge-approved {
+  background-color: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #15803D;
+}
+
+.status-badge-rejected {
+  background-color: #FFE4E6;
+  color: #BE123C;
+  border: 1px solid #BE123C;
+}
+
+.status-badge-draft {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid #475569;
+}
+
+/* Grad-CAM Heatmap Radial Simulation Layer */
+.gradcam-gradient {
+  background: radial-gradient(circle at 48% 54%, rgba(255, 30, 0, 0.75) 0%, rgba(255, 170, 0, 0.55) 26%, rgba(0, 200, 255, 0.3) 52%, transparent 70%);
+  mix-blend-mode: color-dodge;
+}
+
+/* Material Symbols font helper */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Minimal Archival Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #EEF0FF;
+}
+::-webkit-scrollbar-thumb {
+  background: #B0B7D0;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #34497F;
+}
